@@ -7,15 +7,12 @@ public class Player : MonoBehaviour
 {
     public float speed;
     public float jumpForce;
-    private bool isGrounded; // Rename 'pulan' to 'isGrounded'
-    
+
+    private bool isJumping;
+
     private Rigidbody2D rig;
     private Animator anim;
-    private bool isFire;
-    private float movement;
-
-    private bool canFire = true;
-   
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -26,62 +23,56 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        HandleInput(); // Combine movement and jump handling into a single function
-    }
-
-    private void FixedUpdate()
-    {
         Move();
+        Jump();
     }
 
-    void HandleInput()
+    void Move()
     {
-        movement = Input.GetAxis("Horizontal");
+        float movement = Input.GetAxis("Horizontal");
         rig.velocity = new Vector2(movement * speed, rig.velocity.y);
-
-        if (movement > 0 && isGrounded)
+        
+        if (movement > 0)
         {
-            anim.SetInteger("Transition", 1);
-            transform.eulerAngles = Vector3.zero;
-        }
-        else if (movement < 0 && isGrounded)
+            if (!isJumping)
+            {
+                anim.SetInteger("transition", 1);
+            }
+            transform.eulerAngles = new Vector3(0, 0, 0);
+        } 
+        
+        if (movement < 0)
         {
-            anim.SetInteger("Transition", 1);
+            if (!isJumping )
+            {
+                anim.SetInteger("transition", 1);
+            }
             transform.eulerAngles = new Vector3(0, 180, 0);
         }
-        else if (movement == 0 && isGrounded && !isFire)
-        {
-            anim.SetInteger("Transition", 0);
-        }
 
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (movement == 0 && !isJumping)
         {
-            Jump();
-        }
-
-        if (Input.GetKeyDown(KeyCode.F) && isGrounded)
-        {
-            Attack();
+            anim.SetInteger("transition", 0);
         }
     }
 
     void Jump()
     {
-        anim.SetInteger("Transition", 2);
-        rig.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
-        isGrounded = false;
-    }
-
-    void Attack()
-    {
-        anim.SetInteger("Transition", 3);
-    }
-
-    private void OnTriggerStay2D(Collider2D col)
-    {
-        if (col.gameObject.layer == 8) // Assuming the ground's layer is 8
+        if (Input.GetButtonDown("Jump"))
         {
-            isGrounded = true;
+            if(!isJumping)
+            {
+                anim.SetInteger("transition", 2);
+                rig.AddForce(new Vector2(0,jumpForce), ForceMode2D.Impulse);
+                isJumping = true;
+            }
         }
     }
+    void OnTriggerEnter2D(Collider2D col)
+        {
+            if (col.gameObject.layer == 8)
+            {
+                isJumping = false;
+            }
+        }
 }
