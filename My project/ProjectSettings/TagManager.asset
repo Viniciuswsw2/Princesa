@@ -6,6 +6,7 @@ TagManager:
   tags:
   - next
   - nextll
+  - Enemy
   layers:
   - Default
   - TransparentFX
