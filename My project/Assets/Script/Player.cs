@@ -9,6 +9,9 @@ public class Player : MonoBehaviour
     public float jumpForce;
 
     private bool isJumping;
+    private bool porta;
+    private GameObject Portall;
+ 
 
     private Rigidbody2D rig;
     private Animator anim;
@@ -16,6 +19,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Portall = GameObject.Find("Portall");
         rig = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
     }
@@ -25,6 +29,7 @@ public class Player : MonoBehaviour
     {
         Move();
         Jump();
+        novaPosicao();
     }
 
     void Move()
@@ -69,10 +74,24 @@ public class Player : MonoBehaviour
         }
     }
     void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.gameObject.layer == 8)
         {
-            if (col.gameObject.layer == 8)
-            {
-                isJumping = false;
-            }
+            isJumping = false;
         }
+        
+        if(col.gameObject.CompareTag("next"))
+        {
+            porta = true;
+        }
+    }
+    
+    private void novaPosicao()
+    {
+        if(porta == true)
+        {
+            anim.transform.position = new Vector2(Portall.transform.position.x, Portall.transform.position.y);
+            porta = false;
+        }
+    }
 }
